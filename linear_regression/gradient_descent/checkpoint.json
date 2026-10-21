@@ -12,7 +12,8 @@
         "learning_rate": 0.01,
         "epochs_per_round": 1000,
         "tolerance": 1e-05,
-        "final_loss": 445645.24507137254
+        "MSE": 445645.24507137254,
+        "RMSE": 667.5666596463401
     },
-    "last_updated": "2026-10-21 01:26:04"
+    "last_updated": "2026-10-21 01:39:39"
 }

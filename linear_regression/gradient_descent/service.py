@@ -10,11 +10,12 @@ def get_theta(filepath: str) -> tuple[float, float]:
                 return 0.0, 0.0
 
             parameters = model.get("parameters", {})
-            T0 = float(parameters.get("T0", 0.0))
-            T1 = float(parameters.get("T1", 0.0))
-
-            return T0, T1
+            return (
+                float(parameters.get("T0", 0.0)),
+                float(parameters.get("T1", 0.0))
+            )
     except (OSError, json.JSONDecodeError) as error:
+        print(f"Error reading model file: {error}")
         return 0.0, 0.0
 
 
@@ -25,7 +26,7 @@ def main(args):
 
     try:
         km = float(args[0])
-        T0, T1 = get_theta("model.json")
+        T0, T1 = get_theta("checkpoint.json")
         result = T0 + (T1 * km)
 
         print(f"Estimated price: ${result:.2f}")
