@@ -1,0 +1,17 @@
+{
+    "model": {
+        "type": "linear_regression",
+        "parameters": {
+            "T0": 8499.598971227333,
+            "T1": -0.021448957701207243
+        },
+        "function": "F(km) = T0 + (T1 * km)"
+    },
+    "training": {
+        "learning_rate": 0.01,
+        "epochs": 13000,
+        "tolerance": 1e-05,
+        "loss": 445645.2450713728
+    },
+    "last_updated": "2026-10-21 01:14:58"
+}
