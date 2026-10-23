@@ -9,3 +9,4 @@ This directory can contain experiments and other techniques related to linear re
 - [Gradient descent](./gradient_descent/README.md)
   - [Manual implementation](./gradient_descent/handMade/README.md)
   - [NumPy tool implementation](./gradient_descent/toolMade/README.md)
+  - [Extended multi-parameter implementation](./gradient_descent/extend/README.md)

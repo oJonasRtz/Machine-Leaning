@@ -26,3 +26,4 @@ The `checkpoint.json` file stores the parameters learned during training, along 
 
 - [Manual training implementation](./handMade/README.md)
 - [Implementation using a NumPy tool](./toolMade/README.md)
+- [Extended multi-parameter implementation](./extend/README.md)
