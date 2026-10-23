@@ -2,18 +2,18 @@
     "model": {
         "type": "linear_regression",
         "parameters": {
-            "T0": 8499.598971227333,
-            "T1": -0.021448957701207243
+            "T0": 8499.599451394815,
+            "T1": -0.021448961868585543
         },
         "function": "F(km) = T0 + (T1 * km)"
     },
     "training": {
-        "total_epochs": 13000,
+        "total_epochs": 14000,
         "learning_rate": 0.01,
         "epochs_per_round": 1000,
-        "tolerance": 1e-05,
-        "MSE": 445645.24507137254,
-        "RMSE": 667.5666596463401
+        "tolerance": 1e-06,
+        "MSE": 445645.24507128185,
+        "RMSE": 667.5666596462722
     },
-    "last_updated": "2026-10-21 01:39:39"
+    "last_updated": "2026-10-22 21:03:22"
 }

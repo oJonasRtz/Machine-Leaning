@@ -37,6 +37,7 @@ def main(args):
         print(f"An error occurred: {e}")
         return
 
+
 if __name__ == "__main__":
     main(sys.argv[1:])
     

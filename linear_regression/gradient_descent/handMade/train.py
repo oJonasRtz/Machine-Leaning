@@ -2,19 +2,18 @@ import pandas as pd
 import numpy as np
 import json, sys
 from datetime import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 # Represent a linear regression model with parameters theta0 and theta1
 @dataclass
 class Model:
-    theta0: float = 0
-    theta1: float = 0
+    params: np.ndarray = field(default_factory=lambda: [0.0, 0.0])
     scale: float = 100_000
 
     # Predict the output for a given input x using the linear regression model
-    def predict(self, x: float) -> float:
-        return self.theta0 + (self.theta1 * x)
-    
+    def predict(self, x: np.ndarray) -> np.ndarray:
+        return x @ self.params  # Using matrix multiplication for prediction
+
 
     def save_model(self, file_path: str, training: dict = None) -> None:
         try:
@@ -23,8 +22,8 @@ class Model:
                 model={
                     "type": "linear_regression",
                     "parameters": {
-                        "T0": self.theta0,
-                        "T1": self.theta1 / self.scale
+                        "T0": self.params[0],
+                        "T1": self.params[1] / self.scale
                     },
                     "function": "F(km) = T0 + (T1 * km)",
                 },
@@ -46,7 +45,12 @@ class Trainer:
     loss: float = float('inf')
 
     def calculate_loss(self) -> float:
-        x_values = self.data["km"].to_numpy(dtype=float) / self.scale
+        x = self.data["km"].to_numpy(dtype=float) / self.scale
+
+        x_values = np.column_stack([
+            np.ones(len(x)),  # Add a column of ones for the bias term
+            x
+        ])
         y_values = self.data["price"].to_numpy(dtype=float)
 
         predictions = self.model.predict(x_values)
@@ -56,9 +60,8 @@ class Trainer:
         return self.loss
 
 
-    def update_model(self, tmp_theta0: float, tmp_theta1: float) -> None:
-        self.model.theta0 -= tmp_theta0
-        self.model.theta1 -= tmp_theta1
+    def update_model(self, gradient: np.ndarray) -> None:
+        self.model.params -= gradient
 
 
     def train_resume(self) -> dict:
@@ -77,14 +80,20 @@ class Trainer:
         predictions = self.model.predict(x_values)
         diff = predictions - y_values
 
-        tmp_theta0 = self.learning_rate * diff.mean()
-        tmp_theta1 = self.learning_rate * (diff * x_values).mean()
+        gradient = (x_values.T @ diff) / len(x_values)
 
-        return tmp_theta0, tmp_theta1
+        return self.learning_rate * gradient
 
     def gradient_descent(self) -> None:
         # Data preparation
-        x_values = self.data["km"].to_numpy(dtype=float) / self.scale
+        x = self.data["km"].to_numpy(dtype=float) / self.scale
+        # x_values is a matrix [[1, x1],
+        #                        [1, x2],
+        #                        ...,
+        x_values = np.column_stack([
+            np.ones(len(x)), # Add a column of ones for the bias term
+            x
+        ])
         y_values = self.data["price"].to_numpy(dtype=float)
 
         while True:
@@ -92,14 +101,14 @@ class Trainer:
 
             # Predictions and loss calculation
             for _ in range(self.epochs_per_round):
-                tmp_theta0, tmp_theta1 = self.calculate_gradient(x_values, y_values)
-                self.update_model(tmp_theta0, tmp_theta1)
+                gradient = self.calculate_gradient(x_values, y_values)
+                self.update_model(gradient)
 
             # Check for convergence
             improvement = abs(self.loss - self.calculate_loss())
             if improvement < self.tolerance:
                 print(f"Converged after {self.total_epochs} epochs with loss: {self.loss:.6f}")
-                print(f"Final parameters: T0 = {self.model.theta0}, T1 = {self.model.theta1 / self.scale}")
+                print(f"Final parameters: T0 = {self.model.params[0]}, T1 = {self.model.params[1] / self.scale}")
                 break
 
 
@@ -145,25 +154,18 @@ def main(args):
         print(f"Error opening CSV file: {e}")
         return
 
-    # Setup training parameters
-    LEANING_RATE = 0.01
-    EPOCHS = 1000
-    TOLERANCE = 1e-5
-    SCALE = 100_000
-
     # Train the model
-    model = Model(theta0=0.0, theta1=0.0, scale=SCALE)
-    trainer = Trainer(
-        data=data,
-        scale=SCALE,
-        learning_rate=LEANING_RATE,
-        epochs_per_round=EPOCHS,
-        tolerance=TOLERANCE,
-        model=model,
-    )
+    model = Model()
+    trainer = Trainer(data=data, model=model)
     trainer.gradient_descent()
     model.save_model("checkpoint.json", training=trainer.train_resume())
 
+    # Teste usando polyfit
+    x_values = data["km"].to_numpy(dtype=float)
+    y_values = data["price"].to_numpy(dtype=float)
+    t1, t0 = np.polyfit(x_values, y_values, 1)
+
+    print(f"Polyfit parameters: T0 = {t0}, T1 = {t1}")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
