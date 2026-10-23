@@ -17,11 +17,10 @@ class Model:
 
     def save_model(self, file_path: str, training: dict = None) -> None:
         try:
-            parameters = {"T0": self.params[0]}
-            parameters.update({
-                f"T{i}": self.params[i] / self.scale
-                for i in range(1, len(self.params))
-            })
+            parameters = {
+                f"T{i}": self.params[i]
+                for i in range(len(self.params))
+            }
             create_json(
                 file_path,
                 model={
@@ -47,25 +46,8 @@ class Trainer:
     loss: float = float('inf')
 
     def calculate_loss(self) -> float:
-        km = self.data["km"].to_numpy(dtype=float) / self.scale
-        year = self.data["year"].to_numpy(dtype=float) / self.scale
-        engine_size = self.data["engine_size"].to_numpy(dtype=float) / self.scale
-        self.brand = pd.get_dummies(self.data["brand"], drop_first=True)
-        self.car_model = pd.get_dummies(self.data["model"], drop_first=True)
-
-        x_values = np.column_stack([
-            np.ones(len(km)),  # Add a column of ones for the bias term
-            km,
-            year,
-            engine_size,
-            self.brand.to_numpy(dtype=float),
-            self.car_model.to_numpy(dtype=float)
-        ])
-
-        y_values = self.data["price"].to_numpy(dtype=float)
-
-        predictions = self.model.predict(x_values)
-        diff = predictions - y_values
+        predictions = self.model.predict(self.x_values)
+        diff = predictions - self.y_values
 
         self.loss = (diff ** 2).mean()
         return self.loss
@@ -97,40 +79,47 @@ class Trainer:
         predictions = self.model.predict(x_values)
         diff = predictions - y_values
 
-        gradient = (x_values.T @ diff) / len(x_values)
+        gradient = 2* (x_values.T @ diff) / len(x_values)
 
         return self.learning_rate * gradient
 
     def gradient_descent(self) -> None:
         # Data preparation
-        km = self.data["km"].to_numpy(dtype=float) / self.scale
-        year = self.data["year"].to_numpy(dtype=float) / self.scale
-        engine_size = self.data["engine_size"].to_numpy(dtype=float) / self.scale
-        brand = pd.get_dummies(self.data["brand"], drop_first=True).to_numpy(dtype=float)
-        model = pd.get_dummies(self.data["model"], drop_first=True).to_numpy(dtype=float)
+        km = self.data["km"].to_numpy(dtype=float)
+        year = self.data["year"].to_numpy(dtype=float)
+        engine_size = self.data["engine_size"].to_numpy(dtype=float)
+        self.brand = pd.get_dummies(self.data["brand"], drop_first=True)
+        self.car_model = pd.get_dummies(self.data["model"], drop_first=True)
+
+        # Normalization
+        km = (km - km.mean()) / km.std()
+        year = (year - year.mean()) / year.std()
+        engine_size = (engine_size - engine_size.mean()) / engine_size.std()
+
         # x_values is a matrix [[1, x1],
         #                        [1, x2],
         #                        ...,
-        x_values = np.column_stack([
+        self.x_values = np.column_stack([
             np.ones(len(km)), # Add a column of ones for the bias term
             km,
             year,
             engine_size,
-            brand,
-            model
+            self.brand.to_numpy(dtype=float),
+            self.car_model.to_numpy(dtype=float)
         ])
         y_values = self.data["price"].to_numpy(dtype=float)
-        self.model.params = np.zeros(x_values.shape[1])  # Initialize model parameters based on the number of features
+        self.y_values = y_values
+        self.model.params = np.zeros(self. x_values.shape[1])  # Initialize model parameters based on the number of features
 
         while True:
             self.total_epochs += self.epochs_per_round
 
             # Predictions and loss calculation
             for _ in range(self.epochs_per_round):
-                gradient = self.calculate_gradient(x_values, y_values)
+                gradient = self.calculate_gradient(self.x_values, self.y_values)
                 self.update_model(gradient)
 
-            # Check for convergence
+            #Check for convergence
             improvement = abs(self.loss - self.calculate_loss())
             if improvement < self.tolerance:
                 print(f"Converged after {self.total_epochs} epochs with loss: {self.loss:.6f}")
@@ -180,11 +169,10 @@ def main(args):
         return
 
     # Train the model
-    model = Model()
-    trainer = Trainer(data=data, model=model)
+    my_model = Model()
+    trainer = Trainer(data=data, model=my_model)
     trainer.gradient_descent()
-    model.save_model("checkpoint.json", training=trainer.train_resume())
-
+    my_model.save_model("checkpoint.json", training=trainer.train_resume())
 
 if __name__ == "__main__":
     main(sys.argv[1:])
