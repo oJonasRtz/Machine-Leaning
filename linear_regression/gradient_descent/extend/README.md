@@ -54,3 +54,17 @@ python service.py 150000 2012 1.4 Fiat Palio
 ```
 
 The service does not train the model. It uses the parameters already stored in the checkpoint to make a prediction.
+
+## Comparison with scikit-learn
+
+The [`sklearn_train.py`](./sklearn_train.py) script trains the same type of multi-feature linear regression using `LinearRegression` from scikit-learn, an established machine learning library.
+
+It is included as a reference implementation for comparing the gradient descent algorithm developed in [`train.py`](./train.py) with a library-provided solution. Both scripts use the same dataset and features, including mileage, year, engine size, brand, and model, and report the resulting coefficients, MSE, and RMSE.
+
+The scikit-learn script is intended for study and comparison. It does not replace the custom implementation, does not perform the manual gradient descent steps, and does not save a checkpoint for the prediction service.
+
+From this directory, run:
+
+```bash
+python sklearn_train.py dataset.csv
+```
