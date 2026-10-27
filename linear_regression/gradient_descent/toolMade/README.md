@@ -23,3 +23,8 @@ From the `gradient_descent` directory:
 ```bash
 python toolMade/train.py data.csv
 ```
+
+## Analysis notebooks
+
+- [Linear regression analysis](../Linear_regression_demo.ipynb)
+- [Extended gradient descent analysis](../extend/extend_demo.ipynb)

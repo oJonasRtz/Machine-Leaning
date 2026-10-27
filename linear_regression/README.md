@@ -10,3 +10,8 @@ This directory can contain experiments and other techniques related to linear re
   - [Manual implementation](./gradient_descent/handMade/README.md)
   - [NumPy tool implementation](./gradient_descent/toolMade/README.md)
   - [Extended multi-parameter implementation](./gradient_descent/extend/README.md)
+
+## Analysis notebooks
+
+- [Linear regression analysis](./gradient_descent/Linear_regression_demo.ipynb)
+- [Extended gradient descent analysis](./gradient_descent/extend/extend_demo.ipynb)

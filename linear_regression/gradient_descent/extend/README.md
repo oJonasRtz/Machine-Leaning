@@ -68,3 +68,9 @@ From this directory, run:
 ```bash
 python sklearn_train.py dataset.csv
 ```
+
+## Algorithm analysis notebook
+
+The notebook provides a visual demonstration of feature preparation, gradient descent updates, loss reduction, and prediction:
+
+- [Extended gradient descent analysis](./extend_demo.ipynb)

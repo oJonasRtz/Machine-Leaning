@@ -33,3 +33,7 @@ python handMade/train.py data.csv
 ```
 
 The script saves the model to `checkpoint.json` in the current directory. With the command above, the file is created in the `gradient_descent` directory and can be used by [`service.py`](../service.py) to make predictions.
+
+## Analysis notebook
+
+- [Linear regression analysis](../Linear_regression_demo.ipynb)

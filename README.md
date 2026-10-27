@@ -9,3 +9,8 @@ This is a study repository focused on machine learning techniques. Each folder c
     - [Manual implementation](./linear_regression/gradient_descent/handMade/README.md)
     - [NumPy tool implementation](./linear_regression/gradient_descent/toolMade/README.md)
     - [Extended multi-parameter implementation](./linear_regression/gradient_descent/extend/README.md)
+
+## Algorithm analysis notebooks
+
+- [Linear regression analysis](./linear_regression/gradient_descent/Linear_regression_demo.ipynb)
+- [Extended gradient descent analysis](./linear_regression/gradient_descent/extend/extend_demo.ipynb)
